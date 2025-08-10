@@ -1,0 +1,31 @@
+{
+  "name": "subscription-payment-system",
+  "version": "1.0.0",
+  "description": "On-Chain Subscription Payment System using Pull Model",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "node": "hardhat node",
+    "coverage": "hardhat coverage"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@openzeppelin/contracts": "^4.9.0",
+    "@chainlink/contracts": "^0.6.1",
+    "hardhat": "^2.17.0",
+    "chai": "^4.3.7",
+    "ethers": "^6.7.0"
+  },
+  "keywords": [
+    "solidity",
+    "smart-contracts",
+    "subscription",
+    "recurring-payments",
+    "chainlink",
+    "defi"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
