@@ -138,7 +138,7 @@ describe("SubscriptionPaymentSystem", function () {
             await time.increase(PAYMENT_INTERVAL);
 
             await expect(subscriptionSystem.pullPayment(subscriptionId))
-                .to.be.revertedWith("ERC20: insufficient allowance");
+                .to.be.revertedWith("Token transfer failed");
         });
     });
 
@@ -233,7 +233,9 @@ describe("SubscriptionPaymentSystem", function () {
         it("Should expire subscription after expiration date", async function () {
             await mockToken.connect(subscriber).approve(subscriptionSystem.target, PAYMENT_AMOUNT * 10n);
             
-            const expirationDate = Math.floor(Date.now() / 1000) + PAYMENT_INTERVAL * 2;
+            // Get current blockchain time and add future offset
+            const currentTime = await time.latest();
+            const expirationDate = currentTime + PAYMENT_INTERVAL * 2;
             
             await subscriptionSystem.connect(subscriber).createSubscription(
                 recipient.address,
@@ -280,6 +282,11 @@ describe("SubscriptionPaymentSystem", function () {
     });
 
     describe("Chainlink Keeper Integration", function () {
+        beforeEach(async function () {
+            // Enable automation for Chainlink Keeper tests
+            await subscriptionSystem.setAutomationEnabled(true);
+        });
+
         it("Should return correct upkeep data", async function () {
             await mockToken.connect(subscriber).approve(subscriptionSystem.target, PAYMENT_AMOUNT * 10n);
             

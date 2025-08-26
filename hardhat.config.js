@@ -13,6 +13,9 @@ module.exports = {
       viaIR: true // Enable for ERC-4337 contracts
     }
   },
+  paths: {
+    sources: "./contracts", // This ensures only contracts folder is compiled by default
+  },
   networks: {
     hardhat: {
       chainId: 31337,

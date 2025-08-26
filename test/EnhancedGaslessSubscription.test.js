@@ -111,8 +111,8 @@ describe("Enhanced Gasless Subscription System", function () {
     await chainlinkAutomation.setAuthorizedKeeper(deployer.address, true);
 
     // Create smart wallet for user1
-    await smartWalletFactory.createAccount(user1.address, 0);
-    const smartWalletAddress = await smartWalletFactory.getAddress(user1.address, 0);
+    await smartWalletFactory.createWallet(user1.address, 0);
+    const smartWalletAddress = await smartWalletFactory.getWalletAddress(user1.address, 0);
     smartWallet = await ethers.getContractAt("SmartWallet", smartWalletAddress);
 
     // Fund users with tokens
