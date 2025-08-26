@@ -1,7 +1,7 @@
 # 🚀 SubZero Protocol: Advanced Gasless Subscription System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/your-username/gasless-subscription-system/workflows/CI/badge.svg)](https://github.com/your-username/gasless-subscription-system/actions)
+[![Build Status](https://github.com/your-username/gasless-subscription-system/workflows/CI/badge.svg)](https://github.com/AryaSingh22/SubZero-Protocol/actions)
 [![npm version](https://badge.fury.io/js/%40gasless-subscribe%2Fsdk.svg)](https://badge.fury.io/js/%40gasless-subscribe%2Fsdk)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](./test)
 
