@@ -9,7 +9,7 @@ describe("Enhanced Gasless Subscription System", function () {
   let usdc, dai, usdt;
   let entryPointMock;
 
-  const ENTRY_POINT = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+  // Will be set to deployed MockEntryPoint address
 
   beforeEach(async function () {
     [deployer, user1, user2, creator, relayer, integrator] = await ethers.getSigners();
@@ -24,9 +24,14 @@ describe("Enhanced Gasless Subscription System", function () {
     await dai.waitForDeployment();
     await usdt.waitForDeployment();
 
+    // Deploy MockEntryPoint for testing
+    const MockEntryPoint = await ethers.getContractFactory("MockEntryPoint");
+    entryPointMock = await MockEntryPoint.deploy();
+    await entryPointMock.waitForDeployment();
+
     // Deploy SmartWalletFactory
     const SmartWalletFactory = await ethers.getContractFactory("SmartWalletFactory");
-    smartWalletFactory = await SmartWalletFactory.deploy(ENTRY_POINT);
+    smartWalletFactory = await SmartWalletFactory.deploy(entryPointMock.target);
     await smartWalletFactory.waitForDeployment();
 
     // Deploy SubscriptionManagerV2
@@ -67,7 +72,7 @@ describe("Enhanced Gasless Subscription System", function () {
     // Deploy PaymasterV2
     const PaymasterV2 = await ethers.getContractFactory("PaymasterV2");
     paymasterV2 = await PaymasterV2.deploy(
-      ENTRY_POINT,
+      entryPointMock.target,
       deployer.address,
       deployer.address
     );
@@ -172,17 +177,17 @@ describe("Enhanced Gasless Subscription System", function () {
         "{}" // Empty metadata
       );
 
-      const dailyPlan = await subscriptionManagerV2.getPlan(1);
-      const weeklyPlan = await subscriptionManagerV2.getPlan(2);
-      const monthlyPlan = await subscriptionManagerV2.getPlan(3);
+      const dailyPlan = await subscriptionManagerV2.getPlan(0);
+      const weeklyPlan = await subscriptionManagerV2.getPlan(1);
+      const monthlyPlan = await subscriptionManagerV2.getPlan(2);
 
-      expect(dailyPlan.tokenAddress).to.equal(usdc.target);
-      expect(weeklyPlan.tokenAddress).to.equal(dai.target);
-      expect(monthlyPlan.tokenAddress).to.equal(usdt.target);
+      expect(dailyPlan.paymentToken).to.equal(usdc.target);
+      expect(weeklyPlan.paymentToken).to.equal(dai.target);
+      expect(monthlyPlan.paymentToken).to.equal(usdt.target);
 
-      expect(dailyPlan.amount).to.equal(ethers.parseUnits("1", 6));
-      expect(weeklyPlan.amount).to.equal(ethers.parseEther("5"));
-      expect(monthlyPlan.amount).to.equal(ethers.parseUnits("20", 6));
+      expect(dailyPlan.price).to.equal(ethers.parseUnits("1", 6));
+      expect(weeklyPlan.price).to.equal(ethers.parseEther("5"));
+      expect(monthlyPlan.price).to.equal(ethers.parseUnits("20", 6));
     });
 
     it("Should handle custom billing intervals", async function () {
@@ -200,8 +205,8 @@ describe("Enhanced Gasless Subscription System", function () {
         "{}" // Empty metadata
       );
 
-      const plan = await subscriptionManagerV2.getPlan(1);
-      expect(plan.interval).to.equal(259200);
+      const plan = await subscriptionManagerV2.getPlan(0);
+      expect(plan.customInterval).to.equal(259200);
     });
 
     it("Should provide plan analytics", async function () {
@@ -221,9 +226,9 @@ describe("Enhanced Gasless Subscription System", function () {
 
       // Subscribe to the plan
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
 
-      const analytics = await subscriptionManagerV2.getPlanAnalytics(1);
+      const analytics = await subscriptionManagerV2.getPlanAnalytics(0);
       expect(analytics.totalSubscribers).to.equal(1);
       expect(analytics.activeSubscribers).to.equal(1);
     });
@@ -245,10 +250,10 @@ describe("Enhanced Gasless Subscription System", function () {
       );
 
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
 
-      const subscription = await subscriptionManagerV2.getSubscription(1);
-      expect(subscription.nextPaymentTime).to.be.greaterThan(
+      const subscription = await subscriptionManagerV2.getSubscription(0);
+      expect(subscription.nextBillingTime).to.be.greaterThan(
         subscription.startTime + trialPeriod - 100
       );
     });
@@ -342,9 +347,9 @@ describe("Enhanced Gasless Subscription System", function () {
       // Approve integration
       await integrationRegistry.approveIntegration(
         subscriptionManagerV2.target,
-        ethers.parseEther("50"), // Gas allowance
-        ethers.parseEther("1"), // Daily limit
-        ethers.parseEther("30") // Monthly limit
+        50000000, // Gas allowance - 50M gas
+        1000000, // Daily limit - 1M gas
+        30000000 // Monthly limit - 30M gas
       );
 
       const integration = await integrationRegistry.integrations(subscriptionManagerV2.target);
@@ -371,9 +376,9 @@ describe("Enhanced Gasless Subscription System", function () {
       await ethers.provider.send("evm_increaseTime", [7 * 24 * 60 * 60 + 1]);
       await integrationRegistry.approveIntegration(
         subscriptionManagerV2.target,
-        ethers.parseEther("50"),
-        ethers.parseEther("1"),
-        ethers.parseEther("30")
+        50000000, // Gas allowance - 50M gas
+        1000000, // Daily limit - 1M gas
+        30000000 // Monthly limit - 30M gas
       );
 
       // Record usage
