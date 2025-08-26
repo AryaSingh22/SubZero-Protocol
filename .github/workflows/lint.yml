@@ -5,14 +5,12 @@ on:
     branches: [ main, develop ]
     paths:
       - 'sdk/**'
-      - 'dashboard/**'
       - '*.js'
       - '*.ts'
   pull_request:
     branches: [ main ]
     paths:
       - 'sdk/**'
-      - 'dashboard/**'
       - '*.js'
       - '*.ts'
 
@@ -41,7 +39,7 @@ jobs:
     - name: Type check SDK
       run: cd sdk && npm run type-check
 
-  lint-dashboard:
+  lint-sdk-secondary:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -53,14 +51,14 @@ jobs:
         node-version: '18'
         cache: 'npm'
 
-    - name: Install dashboard dependencies
-      run: cd dashboard && npm ci
+    - name: Install SDK dependencies
+      run: cd sdk && npm ci
 
-    - name: Lint dashboard
-      run: cd dashboard && npm run lint
+    - name: Lint SDK
+      run: cd sdk && npm run lint
 
-    - name: Type check dashboard
-      run: cd dashboard && npm run type-check
+    - name: Type check SDK
+      run: cd sdk && npm run type-check
 
-    - name: Build dashboard
-      run: cd dashboard && npm run build
+    - name: Build SDK
+      run: cd sdk && npm run build
