@@ -1,0 +1,58 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Run unit tests
+      run: npx hardhat test
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+
+    - name: Generate coverage report
+      run: npx hardhat coverage
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: smartcontracts
+        name: contract-coverage
+
+    - name: Test gas usage
+      run: npx hardhat test --gas-reporter
+
+    - name: Check coverage threshold
+      run: |
+        COVERAGE=$(grep -o 'Lines.*%' coverage/lcov-report/index.html | head -1 | grep -o '[0-9.]*' | head -1)
+        echo "Coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE < 95" | bc -l) )); then
+          echo "❌ Coverage below 95%"
+          exit 1
+        else
+          echo "✅ Coverage meets requirement"
+        fi

@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+// Custom ERC20 interface
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
+
 /**
  * @title SubscriptionPaymentSystem
  * @dev Raw On-Chain Subscription Payment System using Pull Model (No External Libraries)
  * @notice Enables recurring payments where service providers pull approved tokens at intervals
  */
 contract SubscriptionPaymentSystem {
-    // Custom ERC20 interface
-    interface IERC20 {
-        function totalSupply() external view returns (uint256);
-        function balanceOf(address account) external view returns (uint256);
-        function transfer(address to, uint256 amount) external returns (bool);
-        function allowance(address owner, address spender) external view returns (uint256);
-        function approve(address spender, uint256 amount) external returns (bool);
-        function transferFrom(address from, address to, uint256 amount) external returns (bool);
-    }
 
     // Owner management
     address private _owner;
@@ -322,7 +323,7 @@ contract SubscriptionPaymentSystem {
     function performUpkeep(bytes calldata performData) external {
         require(automationEnabled, "Automation not enabled");
         uint256[] memory subscriptionIds = abi.decode(performData, (uint256[]));
-        batchPullPayments(subscriptionIds);
+        this.batchPullPayments(subscriptionIds);
     }
 
     /**
@@ -444,7 +445,7 @@ contract SubscriptionPaymentSystem {
     /**
      * @dev Get ERC20 token allowance
      */
-    function getTokenAllowance(address token, address owner, address spender) external view returns (uint256) {
-        return IERC20(token).allowance(owner, spender);
+    function getTokenAllowance(address token, address tokenOwner, address spender) external view returns (uint256) {
+        return IERC20(token).allowance(tokenOwner, spender);
     }
 }

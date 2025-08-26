@@ -7,8 +7,12 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js",
+    "deploy:mumbai": "hardhat run scripts/deploy.js --network mumbai",
+    "deploy:polygon-zkevm": "hardhat run scripts/deploy.js --network polygon-zkevm",
     "node": "hardhat node",
-    "coverage": "hardhat coverage"
+    "coverage": "hardhat coverage",
+    "verify:mumbai": "hardhat verify --network mumbai",
+    "verify:polygon-zkevm": "hardhat verify --network polygon-zkevm"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
@@ -16,7 +20,8 @@
     "@chainlink/contracts": "^0.6.1",
     "hardhat": "^2.17.0",
     "chai": "^4.3.7",
-    "ethers": "^6.7.0"
+    "ethers": "^6.7.0",
+    "dotenv": "^16.3.1"
   },
   "keywords": [
     "solidity",
@@ -24,7 +29,13 @@
     "subscription",
     "recurring-payments",
     "chainlink",
-    "defi"
+    "defi",
+    "erc-4337",
+    "account-abstraction",
+    "gasless",
+    "meta-transactions",
+    "polygon",
+    "paymaster"
   ],
   "author": "Your Name",
   "license": "MIT"
