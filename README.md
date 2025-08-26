@@ -1,4 +1,4 @@
-# 🚀 Advanced Gasless Subscription System
+# 🚀 SubZero Protocol: Advanced Gasless Subscription System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/your-username/gasless-subscription-system/workflows/CI/badge.svg)](https://github.com/your-username/gasless-subscription-system/actions)
