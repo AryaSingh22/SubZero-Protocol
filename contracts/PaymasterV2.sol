@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol"; 
 
-interface IEntryPoint {
+interface IEntryPoint { 
     struct UserOperation {
         address sender;
         uint256 nonce;
