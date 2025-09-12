@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-interface ISubscriptionManagerV2 {
+interface ISubscriptionManagerV2 { 
     function chargeSubscriber(uint256 subscriptionId) external returns (bool success);
     function isSubscriptionDue(uint256 subscriptionId) external view returns (bool);
     function getSubscriptionBatch(uint256 offset, uint256 limit) external view returns (uint256[] memory);
