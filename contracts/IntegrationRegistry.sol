@@ -15,7 +15,7 @@ contract IntegrationRegistry is Ownable, ReentrancyGuard, Pausable {
     // Integration status enum 
     enum IntegrationStatus {
         Pending,     // Submitted but not approved
-        Active,      // Approved and active
+        Active,      // Approved and active 
         Suspended,   // Temporarily suspended
         Rejected,    // Rejected by admin
         Revoked      // Permanently revoked
