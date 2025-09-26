@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
  * @notice Manages registration, approval, and configuration of external integrations
  */
 contract IntegrationRegistry is Ownable, ReentrancyGuard, Pausable { 
-    
+     
     // Integration status enum
     enum IntegrationStatus {
         Pending,     // Submitted but not approved
