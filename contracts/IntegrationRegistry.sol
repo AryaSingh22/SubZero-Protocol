@@ -17,7 +17,7 @@ contract IntegrationRegistry is Ownable, ReentrancyGuard, Pausable {
         Pending,     // Submitted but not approved
         Active,      // Approved and active 
         Suspended,   // Temporarily suspended
-        Rejected,    // Rejected by admin
+        Rejected,    // Rejected by admin 
         Revoked      // Permanently revoked
     }
 
