@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";    
 
 /**
- * @title IntegrationRegistry
+ * @title IntegrationRegistry 
  * @dev Registry for third-party dApps to integrate with the gasless subscription system
  * @notice Manages registration, approval, and configuration of external integrations
  */
