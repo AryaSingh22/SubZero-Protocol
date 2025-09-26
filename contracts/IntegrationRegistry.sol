@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 contract IntegrationRegistry is Ownable, ReentrancyGuard, Pausable { 
      
     // Integration status enum 
-    enum IntegrationStatus {
+    enum IntegrationStatus { 
         Pending,     // Submitted but not approved
         Active,      // Approved and active 
         Suspended,   // Temporarily suspended
