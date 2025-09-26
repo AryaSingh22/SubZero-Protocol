@@ -31,7 +31,7 @@ contract IntegrationRegistry is Ownable, ReentrancyGuard, Pausable {
         address contractAddress;
         IntegrationStatus status;
         uint256 gasAllowance;
-        uint256 dailyGasLimit;
+        uint256 dailyGasLimit; 
         uint256 monthlyGasLimit;
         uint256 registrationTimestamp;
         uint256 lastUpdated;
