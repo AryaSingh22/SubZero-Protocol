@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 /** 
  * @title IntegrationRegistry 
  * @dev Registry for third-party dApps to integrate with the gasless subscription system
- * @notice Manages registration, approval, and configuration of external integrations
+ * @notice Manages registration, approval, and configuration of external integrations 
  */
 contract IntegrationRegistry is Ownable, ReentrancyGuard, Pausable { 
      
