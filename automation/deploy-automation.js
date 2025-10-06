@@ -20,7 +20,7 @@ async function main() {
     subscriptionManager: process.env.SUBSCRIPTION_MANAGER_ADDRESS || "",
   };
 
-  const chainId = (await ethers.provider.getNetwork()).chainId;
+  const chainId = (await ethers.provider.getNetwork()).chainId; 
   const gelatoAddress = config.gelato[chainId] || deployer.address;
 
   if (!config.subscriptionManager) {
