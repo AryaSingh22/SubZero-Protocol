@@ -6,12 +6,12 @@ async function main() {
   // Get the deployer account
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
-  console.log("Account balance:", (await ethers.provider.getBalance(deployer.address)).toString());
+  console.log("Account balance:", (await ethers.provider.getBalance(deployer.address)).toString()); 
 
   // Configuration
   const config = {
     // Gelato addresses by network
-    gelato: {
+    gelato: { 
       137: "0x3CACa7b48D0573D611c5f7C582447468a4d04671", // Polygon Mainnet
       80001: "0xF82D64357D9120a760e1E4C75f646E0618e5d895", // Mumbai Testnet
       31337: deployer.address // Use deployer for local testing
