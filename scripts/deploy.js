@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("Deploying SubscriptionPaymentSystem...");
+  console.log("Deploying SubscriptionPaymentSystem..."); 
 
   // Get the deployer account 
   const [deployer] = await ethers.getSigners();
