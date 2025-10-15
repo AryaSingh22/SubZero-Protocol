@@ -14,7 +14,7 @@ async function main() {
   await subscriptionSystem.waitForDeployment();
 
   console.log("SubscriptionPaymentSystem deployed to:", subscriptionSystem.target);
-
+ 
   // Deploy MockERC20 for testing (optional)
   const MockERC20 = await ethers.getContractFactory("MockERC20");
   const mockToken = await MockERC20.deploy("Test Token", "TEST", 1000000);
