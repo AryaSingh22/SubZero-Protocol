@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 async function main() {
   console.log("Deploying SubscriptionPaymentSystem...");
 
-  // Get the deployer account
+  // Get the deployer account 
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await ethers.provider.getBalance(deployer.address)).toString());
