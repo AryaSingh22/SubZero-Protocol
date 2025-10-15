@@ -8,7 +8,7 @@ async function main() {
   const [deployer, subscriber, recipient] = await ethers.getSigners();
 
   // Get contract instances
-  const SubscriptionPaymentSystem = await ethers.getContractFactory("SubscriptionPaymentSystem");
+  const SubscriptionPaymentSystem = await ethers.getContractFactory("SubscriptionPaymentSystem"); 
   const subscriptionSystem = SubscriptionPaymentSystem.attach(SUBSCRIPTION_SYSTEM_ADDRESS);
 
   const MockERC20 = await ethers.getContractFactory("MockERC20");
