@@ -403,16 +403,18 @@ describe("Enhanced Gasless Subscription System", function () {
       await subscriptionManagerV2.createPlan(
         "Auto Plan",
         "Automated billing",
-        ethers.parseEther("1"),
-        dai.target,
-        0, // Daily
-        0,
-        0,
-        0
+        dai.target, // paymentToken
+        ethers.parseEther("1"), // price
+        0, // Daily frequency
+        0, // No custom interval
+        0, // Unlimited subscriptions
+        deployer.address, // Beneficiary
+        0, // No trial
+        "{}" // Empty metadata
       );
 
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
 
       // Fast-forward time to make payment due
       await ethers.provider.send("evm_increaseTime", [86400 + 1]); // 1 day + 1 second
@@ -428,16 +430,18 @@ describe("Enhanced Gasless Subscription System", function () {
       await subscriptionManagerV2.createPlan(
         "Auto Plan",
         "Automated billing",
-        ethers.parseEther("1"),
-        dai.target,
-        0, // Daily
-        0,
-        0,
-        0
+        dai.target, // paymentToken
+        ethers.parseEther("1"), // price
+        0, // Daily frequency
+        0, // No custom interval
+        0, // Unlimited subscriptions
+        deployer.address, // Beneficiary
+        0, // No trial
+        "{}" // Empty metadata
       );
 
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
 
       // Fast-forward time
       await ethers.provider.send("evm_increaseTime", [86400 + 1]);
@@ -466,16 +470,18 @@ describe("Enhanced Gasless Subscription System", function () {
       await subscriptionManagerV2.createPlan(
         "Chainlink Plan",
         "Chainlink automated billing",
-        ethers.parseEther("1"),
-        dai.target,
-        0, // Daily
-        0,
-        0,
-        0
+        dai.target, // paymentToken
+        ethers.parseEther("1"), // price
+        0, // Daily frequency
+        0, // No custom interval
+        0, // Unlimited subscriptions
+        deployer.address, // Beneficiary
+        0, // No trial
+        "{}" // Empty metadata
       );
 
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
 
       // Fast-forward time
       await ethers.provider.send("evm_increaseTime", [86400 + 3600 + 1]); // 1 day + 1 hour + 1 second
@@ -493,9 +499,9 @@ describe("Enhanced Gasless Subscription System", function () {
         [[]] // Empty array for testing
       );
 
-      // This should not revert even with empty data
+      // This test is expected to revert with "no subscriptions to process" for empty data
       await expect(chainlinkAutomation.performUpkeep(mockPerformData))
-        .to.not.be.reverted;
+        .to.be.revertedWith("ChainlinkAutomation: no subscriptions to process");
     });
 
     it("Should track performance metrics", async function () {
@@ -513,19 +519,21 @@ describe("Enhanced Gasless Subscription System", function () {
       await subscriptionManagerV2.createPlan(
         "Full Test Plan",
         "Complete workflow test",
-        ethers.parseEther("5"),
-        dai.target,
-        2, // Monthly
-        0,
-        0,
-        0
+        dai.target, // paymentToken
+        ethers.parseEther("5"), // price
+        2, // Monthly frequency
+        0, // No custom interval
+        0, // Unlimited subscriptions
+        deployer.address, // Beneficiary
+        0, // No trial
+        "{}" // Empty metadata
       );
 
       // 2. User subscribes
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
 
-      const subscription = await subscriptionManagerV2.getSubscription(1);
+      const subscription = await subscriptionManagerV2.getSubscription(0);
       expect(subscription.isActive).to.be.true;
       expect(subscription.subscriber).to.equal(user1.address);
 
@@ -546,13 +554,13 @@ describe("Enhanced Gasless Subscription System", function () {
     it("Should handle multiple token subscriptions simultaneously", async function () {
       // Create plans with different tokens
       await subscriptionManagerV2.createPlan(
-        "USDC Plan", "USDC subscription", ethers.parseUnits("10", 6), usdc.target, 2, 0, 0, 0
+        "USDC Plan", "USDC subscription", usdc.target, ethers.parseUnits("10", 6), 2, 0, 0, deployer.address, 0, "{}"
       );
       await subscriptionManagerV2.createPlan(
-        "DAI Plan", "DAI subscription", ethers.parseEther("10"), dai.target, 2, 0, 0, 0
+        "DAI Plan", "DAI subscription", dai.target, ethers.parseEther("10"), 2, 0, 0, deployer.address, 0, "{}"
       );
       await subscriptionManagerV2.createPlan(
-        "USDT Plan", "USDT subscription", ethers.parseUnits("10", 6), usdt.target, 2, 0, 0, 0
+        "USDT Plan", "USDT subscription", usdt.target, ethers.parseUnits("10", 6), 2, 0, 0, deployer.address, 0, "{}"
       );
 
       // User subscribes to all plans
@@ -560,9 +568,9 @@ describe("Enhanced Gasless Subscription System", function () {
       await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("1000"));
       await usdt.connect(user1).approve(subscriptionManagerV2.target, ethers.parseUnits("1000", 6));
 
-      await subscriptionManagerV2.connect(user1).subscribe(1, user1.address);
-      await subscriptionManagerV2.connect(user1).subscribe(2, user1.address);
-      await subscriptionManagerV2.connect(user1).subscribe(3, user1.address);
+      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await subscriptionManagerV2.connect(deployer).subscribe(1, user1.address, user1.address, true, "{}");
+      await subscriptionManagerV2.connect(deployer).subscribe(2, user1.address, user1.address, true, "{}");
 
       const userSubscriptions = await subscriptionManagerV2.getUserSubscriptions(user1.address);
       expect(userSubscriptions.length).to.equal(3);

@@ -163,15 +163,22 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
   // Check wallet connection status
   useEffect(() => {
     if (sdk.isConnected) {
+      const walletStatus: WalletConnectionStatus = {
+        isConnected: true,
+        smartWalletDeployed: sdk.isSmartWalletDeployed,
+      };
+
+      if (sdk.connectedAddress) {
+        walletStatus.address = sdk.connectedAddress;
+      }
+      if (sdk.smartWalletAddr) {
+        walletStatus.smartWalletAddress = sdk.smartWalletAddr;
+      }
+
       setState(prev => ({
         ...prev,
         isConnected: true,
-        walletStatus: {
-          isConnected: true,
-          address: sdk.connectedAddress,
-          smartWalletAddress: sdk.smartWalletAddr,
-          smartWalletDeployed: sdk.isSmartWalletDeployed,
-        },
+        walletStatus,
       }));
     }
   }, [sdk]);
@@ -207,10 +214,15 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
       
       const status: WalletConnectionStatus = {
         isConnected: true,
-        address: sdk.connectedAddress,
-        smartWalletAddress: sdk.smartWalletAddr,
         smartWalletDeployed: sdk.isSmartWalletDeployed,
       };
+
+      if (sdk.connectedAddress) {
+        status.address = sdk.connectedAddress;
+      }
+      if (sdk.smartWalletAddr) {
+        status.smartWalletAddress = sdk.smartWalletAddr;
+      }
       
       setState(prev => ({
         ...prev,
@@ -312,9 +324,9 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
   }
 
   return (
-    <div className=\"gasless-subscribe-button\">
+    <div className="gasless-subscribe-button\">
       {showPlanDetails && state.plan && (
-        <div className=\"plan-details\" style={{ marginBottom: '12px' }}>
+        <div className="plan-details\" style={{ marginBottom: '12px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '18px' }}>{state.plan.name}</h3>
           <p style={{ margin: '0 0 8px 0', color: '#666', fontSize: '14px' }}>
             {state.plan.description}

@@ -496,8 +496,6 @@ contract SubscriptionManagerV2 is Ownable, ReentrancyGuard, Pausable {
         );
     }
 
-    // ... (Additional functions for batch operations, analytics, etc. continue in next part)
-
     /**
      * @dev Batch charge multiple subscribers with enhanced tracking
      * @param subscriptionIds Array of subscription IDs to charge
@@ -507,7 +505,7 @@ contract SubscriptionManagerV2 is Ownable, ReentrancyGuard, Pausable {
     ) external onlyAuthorizedKeeper nonReentrant whenNotPaused {
         require(subscriptionIds.length <= maxBatchSize, "SubscriptionManagerV2: batch too large");
 
-        for (uint256 i = 0; i < subscriptionIds.length; i++) {
+        for (uint256 i = 0; i < subscriptionIds.length;) {
             if (subscriptionIds[i] < nextSubscriptionId) {
                 UserSubscription storage subscription = userSubscriptions[subscriptionIds[i]];
                 
@@ -518,6 +516,7 @@ contract SubscriptionManagerV2 is Ownable, ReentrancyGuard, Pausable {
                     _chargeSubscriberInternal(subscriptionIds[i]);
                 }
             }
+            unchecked { i++; }
         }
     }
 

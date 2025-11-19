@@ -211,7 +211,7 @@ async function fetchSubscriptionEvents(
     data: log.data,
     blockHash: log.blockHash,
     transactionIndex: log.transactionIndex,
-    logIndex: log.logIndex,
+    // logIndex removed - not in ethers v6 Log type
   }));
 
   return events;

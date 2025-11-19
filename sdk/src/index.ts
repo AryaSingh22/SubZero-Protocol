@@ -78,6 +78,10 @@ export const SUPPORTED_NETWORKS = {
   HARDHAT: 31337,
 };
 
+import { SDKConfig, GaslessSubscriptionConfig } from './types';
+import { GaslessSubscriptionSDK } from './services/GaslessSubscriptionSDK';
+import { CONTRACT_ADDRESSES } from './contracts';
+
 // Factory function for easy SDK initialization
 export function createGaslessSubscriptionSDK(config: SDKConfig): GaslessSubscriptionSDK {
   return new GaslessSubscriptionSDK(config);
