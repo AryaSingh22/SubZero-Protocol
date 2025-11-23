@@ -10,7 +10,7 @@ interface ISubscriptionManagerV2 {
     function getSubscriptionBatch(uint256 offset, uint256 limit) external view returns (uint256[] memory);
     function getSubscription(uint256 subscriptionId) external view returns (
         uint256 id,
-        uint256 planId,
+        uint256 planId, 
         address subscriber,
         uint256 startTime,
         uint256 nextPaymentTime,
