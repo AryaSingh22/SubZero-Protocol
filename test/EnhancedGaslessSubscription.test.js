@@ -133,6 +133,49 @@ describe("Enhanced Gasless Subscription System", function () {
     await paymasterV2.deposit({ value: ethers.parseEther("10") });
   });
 
+  async function approveSubscription(signer, smartWalletContract, tokenAddress, spenderAddress, amount) {
+    const chainId = (await ethers.provider.getNetwork()).chainId;
+    const domain = {
+      name: "SmartWallet",
+      version: "1",
+      chainId: chainId,
+      verifyingContract: smartWalletContract.target
+    };
+
+    const types = {
+      SubscriptionApproval: [
+        { name: "token", type: "address" },
+        { name: "spender", type: "address" },
+        { name: "amount", type: "uint256" },
+        { name: "nonce", type: "uint256" },
+        { name: "deadline", type: "uint256" }
+      ]
+    };
+
+    const nonce = await smartWalletContract.getSubscriptionNonce(tokenAddress, spenderAddress);
+    const block = await ethers.provider.getBlock("latest");
+    const deadline = block.timestamp + 3600; // 1 hour from current block timestamp
+
+    const value = {
+      token: tokenAddress,
+      spender: spenderAddress,
+      amount: amount,
+      nonce: nonce,
+      deadline: deadline
+    };
+
+    const signature = await signer.signTypedData(domain, types, value);
+
+    await smartWalletContract.connect(signer).approveSubscription(
+        tokenAddress,
+        spenderAddress,
+        amount,
+        nonce,
+        deadline,
+        signature
+    );
+  }
+
   describe("SubscriptionManagerV2 - Multi-token Support", function () {
     it("Should support multiple billing frequencies", async function () {
       // Daily plan with USDC
@@ -225,8 +268,8 @@ describe("Enhanced Gasless Subscription System", function () {
       );
 
       // Subscribe to the plan
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("100"));
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
 
       const analytics = await subscriptionManagerV2.getPlanAnalytics(0);
       expect(analytics.totalSubscribers).to.equal(1);
@@ -249,12 +292,12 @@ describe("Enhanced Gasless Subscription System", function () {
         "{}" // Empty metadata
       );
 
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("100"));
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
 
       const subscription = await subscriptionManagerV2.getSubscription(0);
       expect(subscription.nextBillingTime).to.be.greaterThan(
-        subscription.startTime + trialPeriod - 100
+        subscription.startTime + BigInt(trialPeriod) - BigInt(100)
       );
     });
   });
@@ -413,8 +456,8 @@ describe("Enhanced Gasless Subscription System", function () {
         "{}" // Empty metadata
       );
 
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("100"));
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
 
       // Fast-forward time to make payment due
       await ethers.provider.send("evm_increaseTime", [86400 + 1]); // 1 day + 1 second
@@ -440,8 +483,8 @@ describe("Enhanced Gasless Subscription System", function () {
         "{}" // Empty metadata
       );
 
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("100"));
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
 
       // Fast-forward time
       await ethers.provider.send("evm_increaseTime", [86400 + 1]);
@@ -449,7 +492,9 @@ describe("Enhanced Gasless Subscription System", function () {
 
       const dueSubscriptions = await gelatoAutomation.getDueSubscriptions();
       if (dueSubscriptions.length > 0) {
-        await expect(gelatoAutomation.executeBatch(dueSubscriptions))
+        // Convert to regular array to avoid read-only property issues with ethers Result object
+        const subIds = Array.from(dueSubscriptions);
+        await expect(gelatoAutomation.executeBatch(subIds))
           .to.emit(gelatoAutomation, "BatchExecutionCompleted");
       }
     });
@@ -480,8 +525,8 @@ describe("Enhanced Gasless Subscription System", function () {
         "{}" // Empty metadata
       );
 
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("100"));
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
 
       // Fast-forward time
       await ethers.provider.send("evm_increaseTime", [86400 + 3600 + 1]); // 1 day + 1 hour + 1 second
@@ -530,12 +575,12 @@ describe("Enhanced Gasless Subscription System", function () {
       );
 
       // 2. User subscribes
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("100"));
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("100"));
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
 
       const subscription = await subscriptionManagerV2.getSubscription(0);
       expect(subscription.isActive).to.be.true;
-      expect(subscription.subscriber).to.equal(user1.address);
+      expect(subscription.subscriber).to.equal(smartWallet.target);
 
       // 3. Fast-forward to make payment due
       await ethers.provider.send("evm_increaseTime", [2592000 + 3600 + 1]); // 30 days + 1 hour + 1 second
@@ -564,15 +609,15 @@ describe("Enhanced Gasless Subscription System", function () {
       );
 
       // User subscribes to all plans
-      await usdc.connect(user1).approve(subscriptionManagerV2.target, ethers.parseUnits("1000", 6));
-      await dai.connect(user1).approve(subscriptionManagerV2.target, ethers.parseEther("1000"));
-      await usdt.connect(user1).approve(subscriptionManagerV2.target, ethers.parseUnits("1000", 6));
+      await approveSubscription(user1, smartWallet, usdc.target, subscriptionManagerV2.target, ethers.parseUnits("1000", 6));
+      await approveSubscription(user1, smartWallet, dai.target, subscriptionManagerV2.target, ethers.parseEther("1000"));
+      await approveSubscription(user1, smartWallet, usdt.target, subscriptionManagerV2.target, ethers.parseUnits("1000", 6));
 
-      await subscriptionManagerV2.connect(deployer).subscribe(0, user1.address, user1.address, true, "{}");
-      await subscriptionManagerV2.connect(deployer).subscribe(1, user1.address, user1.address, true, "{}");
-      await subscriptionManagerV2.connect(deployer).subscribe(2, user1.address, user1.address, true, "{}");
+      await subscriptionManagerV2.connect(deployer).subscribe(0, smartWallet.target, user1.address, true, "{}");
+      await subscriptionManagerV2.connect(deployer).subscribe(1, smartWallet.target, user1.address, true, "{}");
+      await subscriptionManagerV2.connect(deployer).subscribe(2, smartWallet.target, user1.address, true, "{}");
 
-      const userSubscriptions = await subscriptionManagerV2.getUserSubscriptions(user1.address);
+      const userSubscriptions = await subscriptionManagerV2.getUserSubscriptions(smartWallet.target);
       expect(userSubscriptions.length).to.equal(3);
 
       // Verify all subscriptions are active

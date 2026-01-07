@@ -730,6 +730,42 @@ contract SubscriptionManagerV2 is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @dev Check if subscription is due for payment
+     * @param subscriptionId Subscription ID
+     */
+    function isSubscriptionDue(uint256 subscriptionId) external view returns (bool) {
+        if (subscriptionId >= nextSubscriptionId) return false;
+
+        UserSubscription storage subscription = userSubscriptions[subscriptionId];
+        SubscriptionPlan storage plan = subscriptionPlans[subscription.planId];
+
+        return subscription.isActive &&
+               block.timestamp >= subscription.nextBillingTime &&
+               plan.isActive;
+    }
+
+    /**
+     * @dev Get a batch of subscriptions for processing
+     * @param offset Start index
+     * @param limit Maximum number of subscriptions to return
+     */
+    function getSubscriptionBatch(uint256 offset, uint256 limit) external view returns (uint256[] memory) {
+        if (offset >= nextSubscriptionId) {
+            return new uint256[](0);
+        }
+
+        uint256 remaining = nextSubscriptionId - offset;
+        uint256 count = limit < remaining ? limit : remaining;
+        uint256[] memory batch = new uint256[](count);
+
+        for (uint256 i = 0; i < count; i++) {
+            batch[i] = offset + i;
+        }
+
+        return batch;
+    }
+
+    /**
      * @dev Check if token is supported
      * @param token Token address
      */
