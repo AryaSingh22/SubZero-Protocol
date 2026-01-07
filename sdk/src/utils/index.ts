@@ -204,8 +204,8 @@ export function getUserOperationHash(
  */
 export function formatTokenAmount(
   amount: string,
-  decimals: number = 18,
-  precision: number = 4
+  decimals = 18,
+  precision = 4
 ): string {
   const formatted = ethers.formatUnits(amount, decimals);
   const num = parseFloat(formatted);
@@ -222,7 +222,7 @@ export function formatTokenAmount(
  * @param decimals Token decimals
  * @returns Amount in wei
  */
-export function parseTokenAmount(amount: string, decimals: number = 18): string {
+export function parseTokenAmount(amount: string, decimals = 18): string {
   return ethers.parseUnits(amount, decimals).toString();
 }
 
@@ -271,7 +271,7 @@ export function calculateNextPaymentTime(
  */
 export function isPaymentDue(
   nextPaymentTime: number,
-  gracePeriod: number = 3600
+  gracePeriod = 3600
 ): boolean {
   const now = getCurrentTimestamp();
   return now >= (nextPaymentTime - gracePeriod);
@@ -331,8 +331,8 @@ export function sleep(ms: number): Promise<void> {
  */
 export async function retry<T>(
   fn: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelay: number = 1000
+  maxRetries = 3,
+  baseDelay = 1000
 ): Promise<T> {
   let lastError: Error;
   
