@@ -1,6 +1,15 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+task("test")
+  .addFlag("gasReporter", "Enable gas reporter")
+  .setAction(async (args, hre, runSuper) => {
+    if (args.gasReporter) {
+      hre.config.gasReporter.enabled = true;
+    }
+    await runSuper(args);
+  });
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
