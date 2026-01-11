@@ -1,13 +1,28 @@
 import { ethers } from 'ethers';
+import {
+  PAYMASTER_ABI,
+  ERC20_ABI,
+  SUBSCRIPTION_MANAGER_ABI,
+  SMART_WALLET_FACTORY_ABI,
+  SMART_WALLET_ABI,
+} from '../contracts';
 import type {
   SDKConfig,
   SubscribeOptions,
   UnsubscribeOptions,
   SubscriptionPlan,
   Subscription,
-  PAYMASTER_ABI,
-  ERC20_ABI,
-} from '../contracts';
+  GaslessSubscriptionConfig,
+  WalletConnectionStatus,
+  TransactionResult,
+  UserOperation,
+  AnalyticsData,
+} from '../types';
+import {
+  WalletError,
+  ContractError,
+  TransactionError,
+} from '../types';
 import {
   calculateSmartWalletAddress,
   signUserOperation,
@@ -94,7 +109,7 @@ export class GaslessSubscriptionSDK {
       const status: WalletConnectionStatus = {
         isConnected: true,
         address: this.walletAddress,
-        chainId: (await this.provider.getNetwork()).chainId,
+        chainId: Number((await this.provider.getNetwork()).chainId),
         smartWalletAddress: this.smartWalletAddress,
         smartWalletDeployed,
       };
